@@ -1,0 +1,249 @@
+{#
+Copyright(c) 2016 MDL Paygent, Inc. All rights reserved.
+http://www.paygent.co.jp/
+#}
+{% extends  'default_frame.twig' %}
+
+{% block javascript %}
+    <script>
+        $( "form" ).submit(function( event ) {
+            $(".btn").attr("disabled",true);
+      });
+	  $(document).ready(function () {
+		  if ($('#mdl_payment_stock').prop('checked')) {
+			  	$("#stockFlag").val("1");
+				$("#deletecard").val("1");
+			  	$('#expireYear').hide();
+				$('#cardSaved').hide();
+				$('#cardNo').hide();
+				$('#cardName').hide();
+				$('#registCard').hide();
+			}else{
+				$("#deletecard").val("0");
+				$("#stockFlag").val("0");
+				$('#expireYear').show();
+				$('#cardSaved').show();
+				$('#cardNo').show();
+				$('#cardName').show();
+				$('#registCard').show();
+			}
+			 $('#mdl_payment_stock').change(function(){
+				if (this.checked) {
+					$("#stockFlag").val("1");
+					$("#deletecard").val("1");
+					$('#expireYear').hide();
+					$('#cardSaved').hide();
+					$('#cardNo').hide();
+					$('#cardName').hide();
+					$('#registCard').hide();
+				} else {
+					$("#deletecard").val("0");
+					$("#stockFlag").val("0");
+					$('#expireYear').show();
+					$('#cardSaved').show();
+					$('#cardNo').show();
+					$('#cardName').show();
+					$('#registCard').show();
+				}
+			});
+			//
+			$('#btnRemove').click(function(){
+				$("#deletecard").val("1");
+			});
+
+			$('#btnNext').click(function(){
+				$("#deletecard").val("0");
+			});
+		});
+
+    </script>
+    <style type="text/css">
+        .gmo-payment-inner table{
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+        }
+        .gmo-payment-inner .text-center{
+            text-align: center;
+        }
+        .gmo-payment-inner .text-right{
+            text-align: right;
+        }
+        .gmo-payment-inner .dl_table dd {
+            padding: 8px;
+        }
+        @media only screen and (min-width: 768px){
+            .gmo-payment-inner .dl_table dd {
+                padding: 8px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div id="main_middle">
+        <div class="container-fluid gmo-container">
+            <h2 class="title">ペイジェント クレジット</h2>
+            <div class="gmo-payment-inner">
+                <form name="formCredit" id="formCredit" method="post" action="">
+                    {{ form_widget(formCredit._token) }}
+                    {% if error is defined and error is not empty %}
+                	<div style = "color: red; float: left;">
+                    	<p>{{ error | raw  }}</p>
+                	</div>
+            		{% endif %}
+                    <input type="hidden" name="mode" value="next"/>
+                    <input type="hidden" id ="deletecard" name="deletecard" value=""/>
+                    <input type="hidden" id = "stockFlag" name="stockFlag" value=""/>
+
+                    <div class="dl_table" id="payment_form_body" style="">
+						<dl>
+                            <dt>支払回数</span></dt>
+                            <dd>
+                                <div class="form-group form-inline {% if formCredit.payment_class.vars.errors is not empty %}has-error{% endif %}">
+                                    {{ form_widget(formCredit.payment_class) }}
+                                </div>
+                            </dd>
+                        </dl>
+                        {% if list_data is not empty %}
+						<dl>
+                            <dt>登録カード</span></dt>
+                            <dd>
+                            	{% if error_card is defined and error_card is not empty %}
+			                    	<p style="color: red;">{{ error_card | raw  }}</p>
+			            		{% endif %}
+								<div>
+                                    {{ form_widget(formCredit.stock) }}
+                                </div>
+                                <div style="margin-top:10px">
+                                    <table class="table table-bordered">
+										<thead>
+										  <tr>
+											<th>選択</th>
+											<th>カード番号</th>
+											<th>有効期限</th>
+											<th>カード名義</th>
+										  </tr>
+										</thead>
+										<tbody>
+										{% for data in list_data %}
+										  <tr id='tblRow{{data.cardSeq }}'>
+											<td>
+												<input type="radio" name="cardSeq" value="{{ data.cardSeq }}" />
+											</td>
+											<td>{{data.card_number}}</td>
+											<td>{{data.card_valid_term}}</td>
+											<td>{{data.cardholder_name}}</td>
+										  </tr>
+										{% endfor %}
+										</tbody>
+									</table>
+                                </div>
+								<div class="col-sm-2">
+									<p><button type="submit" class="btn" id="btnRemove">選択カードの削除</button></p>
+								</div>
+                            </dd>
+                        </dl>
+						{% endif %}
+                        <dl id="cardNo">
+                            <dt>カード番号</dt>
+                            <dd>
+                                <div class="form-group form-inline">
+                                    <div style="float:left; width: 100%;" >
+                                    	{{ form_errors(formCredit.card_no01) }}
+                                        {{ form_errors(formCredit.card_no02) }}
+                                        {{ form_errors(formCredit.card_no03) }}
+                                        {{ form_errors(formCredit.card_no04) }}
+                                     </div>
+                                     <div style="float:left;" class = "{% if formCredit.card_no01.vars.errors is not empty %}has-error{% endif %}">
+                                     	{{ form_widget(formCredit.card_no01) }}  &nbsp; - &nbsp;
+                                     </div>
+                                     <div style="float:left;" class = "{% if formCredit.card_no02.vars.errors is not empty %}has-error{% endif %}">
+                                     	{{ form_widget(formCredit.card_no02) }}  &nbsp; - &nbsp;
+                                     </div>
+                                     <div style="float:left;" class = "{% if formCredit.card_no03.vars.errors is not empty %}has-error{% endif %}">
+                                     	{{ form_widget(formCredit.card_no03) }}  &nbsp; - &nbsp;
+                                     </div>
+                                     <div class = "{% if formCredit.card_no04.vars.errors is not empty %}has-error{% endif %}">
+                                     	{{ form_widget(formCredit.card_no04) }}  &nbsp;
+                                     </div>
+                                     <div>
+	                                    <p><span style="color:red; margin-top: 10px;">ご本人名義のカードをご使用ください。</span><br>
+	                                   	 半角入力（例：1234-5678-9012-3456）</p>
+                                	</div>
+                                </div>
+
+                            </dd>
+                        </dl>
+                        {% if arrData.security_code is defined and arrData.security_code == 1 %}
+                            <dl id="securityCode">
+                                <dt>セキュリティコード</dt>
+                                <dd>
+                                    <div class="form-group form-inline {% if formCredit.security_code.vars.errors is not empty %}has-error{% endif %}">
+                                        {{ form_errors(formCredit.security_code) }}
+                        				{{ form_widget(formCredit.security_code) }}
+                                    </div>
+                                </dd>
+                            </dl>
+                         {% endif %}
+
+                        <dl id="expireYear">
+                            <dt>有効期限</dt>
+                            <dd>
+                                <div class="form-group form-inline {% if formCredit.card_month.vars.errors is not empty or formCredit.card_year.vars.errors is not empty %}has-error{% endif %}">
+                         		{{ form_errors(formCredit.card_month) }}
+                                {{ form_errors(formCredit.card_year) }}
+                         		{{ form_widget(formCredit.card_month) }}月 / {{ form_widget(formCredit.card_year) }}年
+
+                                </div>
+                            </dd>
+                        </dl>
+                        <dl id="cardName">
+                            <dt>カード名義<br>（ローマ字）</dt>
+                            <dd>
+                                <div class="form-group form-inline">
+                                     <div style="float:left; width: 100%;" >
+										{{ form_errors(formCredit.card_name01) }}
+	                                    {{ form_errors(formCredit.card_name02) }}
+                                     </div>
+                                     <div style="float:left;" class = "{% if formCredit.card_name01.vars.errors is not empty %}has-error{% endif %}">{{ form_widget(formCredit.card_name01) }}  &nbsp;  &nbsp; - &nbsp;</div>
+                                     <div class = "{% if formCredit.card_name02.vars.errors is not empty %}has-error{% endif %}"> {{ form_widget(formCredit.card_name02) }} </div>
+                                     <div style="margin-top: 10px;">（例：TARO YAMADA） </div>
+                                </div>
+
+                            </dd>
+                        </dl>
+						{% if arrData.stock_flg is defined and arrData.stock_flg == 1 %}
+						<dl id="registCard">
+                            <dt>カード登録</dt>
+                            <dd>
+                                <div class="form-group form-inline">
+                                        {{ form_widget(formCredit.stock_new) }}
+                                </div>
+								<div>
+									<p>カード情報を登録しておくと、次回以降の購入時にカード情報入力が省略でき、大変便利です。<br>
+										最大5件まで登録できます。
+									</p>
+								</div>
+                            </dd>
+                        </dl>
+                        {% endif %}
+						<!-- <hr style="background:#D3D3D3; border:0; height:1px"> -->
+                    </div>
+					<div style="margin-top:10px">
+						以上の内容で間違いなければ、下記「次へ」ボタンをクリックしてください。<br>
+						<span style="color:red">※画面が切り替るまで少々時間がかかる場合がございますが、そのままお待ちください。</span>
+						<hr style="background:#D3D3D3; border:0; height:2px">
+					</div>
+                    <div class="row no-padding" style="">
+                        <div class="col-sm-offset-2 col-sm-4">
+                            <p><a href="{{path('mdl_shopping_payment_back')}}" class="btn btn btn-info btn-block ">戻る</a></p>
+                        </div>
+                        <div class="col-sm-4">
+                            <p><button type="submit" id="btnNext" class="btn btn-primary btn-block">ご注文完了ページへ</button></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
